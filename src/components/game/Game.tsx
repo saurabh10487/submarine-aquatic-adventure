@@ -383,6 +383,14 @@ const Game: React.FC = () => {
     setLives(3);
     setTime(60);
     setGameOver(false);
+    setIsCleaning(false);
+    setIsDestroying(false);
+    
+    if (gameContainerRef.current) {
+      const { width, height } = gameContainerRef.current.getBoundingClientRect();
+      setSubmarinePosition({ x: width / 2 - 45, y: height / 2 - 25 });
+    }
+    
     setFishes(generateFishes(6));
     setTreasures(generateTreasures(5));
     setHurdles(generateHurdles(4));

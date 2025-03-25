@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { RefreshCw } from 'lucide-react';
 
 interface GameUIProps {
   score: number;
@@ -56,6 +57,14 @@ const GameUI: React.FC<GameUIProps> = ({ score, lives, time, onRestart, gameOver
         </svg>
         <span className="text-white font-light text-lg">{formatTime(time)}</span>
       </div>
+      
+      <button 
+        onClick={onRestart}
+        className="flex items-center justify-center ml-2 p-1.5 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-200"
+        title="Restart Game"
+      >
+        <RefreshCw size={16} className="text-white" />
+      </button>
     </div>
   );
 };
