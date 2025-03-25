@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Submarine from './Submarine';
 import Fish from './Fish';
@@ -52,15 +51,13 @@ const Game: React.FC = () => {
   const [pollutionItems, setPollutionItems] = useState<PollutionType[]>([]);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
-  const [time, setTime] = useState(60); // 60 seconds game time
+  const [time, setTime] = useState(60);
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   
-  // Colors for fish
   const fishColors = ['red', 'blue', 'green', 'purple', 'yellow'];
-  
-  // Initialize game
+
   useEffect(() => {
     if (gameContainerRef.current) {
       const { width, height } = gameContainerRef.current.getBoundingClientRect();
@@ -70,7 +67,6 @@ const Game: React.FC = () => {
     
     startGame();
     
-    // Event listeners for resize
     const handleResize = () => {
       if (gameContainerRef.current) {
         const { width, height } = gameContainerRef.current.getBoundingClientRect();
@@ -88,7 +84,6 @@ const Game: React.FC = () => {
     };
   }, []);
 
-  // Generate random pollution items
   const generatePollution = (count: number): PollutionType[] => {
     const types: ('plastic' | 'oil' | 'trash')[] = ['plastic', 'oil', 'trash'];
     const newPollution = [];
@@ -105,8 +100,7 @@ const Game: React.FC = () => {
     }
     return newPollution;
   };
-  
-  // Game timer
+
   useEffect(() => {
     if (!isPlaying || gameOver) return;
     
@@ -123,66 +117,59 @@ const Game: React.FC = () => {
     
     return () => clearInterval(timer);
   }, [isPlaying, gameOver]);
-  
-  // Move submarine with mouse or touch
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (gameContainerRef.current) {
+      const rect = gameContainerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const dx = x - (submarinePosition.x + 45);
+      const dy = y - (submarinePosition.y + 25);
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      
+      setSubmarineRotation(angle);
+      
+      setSubmarinePosition(prev => ({
+        x: Math.max(0, Math.min(prev.x + dx * 0.1, containerSize.width - 90)),
+        y: Math.max(0, Math.min(prev.y + dy * 0.1, containerSize.height - 50))
+      }));
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (e.touches.length && gameContainerRef.current) {
+      const rect = gameContainerRef.current.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      
+      const dx = x - (submarinePosition.x + 45);
+      const dy = y - (submarinePosition.y + 25);
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      
+      setSubmarineRotation(angle);
+      
+      setSubmarinePosition(prev => ({
+        x: Math.max(0, Math.min(prev.x + dx * 0.05, containerSize.width - 90)),
+        y: Math.max(0, Math.min(prev.y + dy * 0.05, containerSize.height - 50))
+      }));
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.code === 'Space') {
+      setIsCleaning(true);
+      checkPollutionClean();
+      
+      setTimeout(() => {
+        setIsCleaning(false);
+      }, 500);
+    }
+  };
+
   useEffect(() => {
     if (!isPlaying || gameOver) return;
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      if (gameContainerRef.current) {
-        const rect = gameContainerRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        // Calculate angle for submarine rotation
-        const dx = x - (submarinePosition.x + 45);
-        const dy = y - (submarinePosition.y + 25);
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        
-        setSubmarineRotation(angle);
-        
-        // Move submarine with some lag for smooth effect
-        setSubmarinePosition(prev => ({
-          x: Math.max(0, Math.min(prev.x + dx * 0.1, containerSize.width - 90)),
-          y: Math.max(0, Math.min(prev.y + dy * 0.1, containerSize.height - 50))
-        }));
-      }
-    };
-    
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length && gameContainerRef.current) {
-        const rect = gameContainerRef.current.getBoundingClientRect();
-        const touch = e.touches[0];
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
-        
-        // Calculate angle for submarine rotation
-        const dx = x - (submarinePosition.x + 45);
-        const dy = y - (submarinePosition.y + 25);
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        
-        setSubmarineRotation(angle);
-        
-        // Move submarine with some lag for smooth effect
-        setSubmarinePosition(prev => ({
-          x: Math.max(0, Math.min(prev.x + dx * 0.05, containerSize.width - 90)),
-          y: Math.max(0, Math.min(prev.y + dy * 0.05, containerSize.height - 50))
-        }));
-      }
-    };
-    
-    // Handle cleaning action with spacebar
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        setIsCleaning(true);
-        checkPollutionClean();
-        
-        // Stop cleaning after animation duration
-        setTimeout(() => {
-          setIsCleaning(false);
-        }, 500);
-      }
-    };
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('touchmove', handleTouchMove, { passive: true });
@@ -194,15 +181,14 @@ const Game: React.FC = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [submarinePosition, isPlaying, gameOver, containerSize, isCleaning]);
-  
-  // Check if submarine can clean pollution
+
   const checkPollutionClean = () => {
     const subX = submarinePosition.x;
     const subY = submarinePosition.y;
     const subWidth = 90;
     const subHeight = 50;
-    const cleaningRadius = 60; // Slightly bigger than submarine for better UX
-    
+    const cleaningRadius = 60;
+
     setPollutionItems(prev => 
       prev.map(pollutionItem => {
         if (pollutionItem.cleaned) return pollutionItem;
@@ -212,14 +198,11 @@ const Game: React.FC = () => {
         const subCenterX = subX + subWidth / 2;
         const subCenterY = subY + subHeight / 2;
         
-        // Calculate distance between submarine center and pollution center
         const dx = subCenterX - pollutionX;
         const dy = subCenterY - pollutionY;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // If submarine is in cleaning range of pollution
         if (distance < cleaningRadius) {
-          // Add points based on pollution type
           const pointValue = pollutionItem.type === 'oil' ? 15 : 10;
           setScore(prev => prev + pointValue);
           return { ...pollutionItem, cleaned: true };
@@ -229,8 +212,7 @@ const Game: React.FC = () => {
       })
     );
   };
-  
-  // Collision detection
+
   useEffect(() => {
     if (!isPlaying || gameOver) return;
     
@@ -240,7 +222,6 @@ const Game: React.FC = () => {
       const subWidth = 90;
       const subHeight = 50;
       
-      // Check treasure collisions
       setTreasures(prev => 
         prev.map(treasure => {
           if (treasure.collected) return treasure;
@@ -248,7 +229,6 @@ const Game: React.FC = () => {
           const treasureX = treasure.x;
           const treasureY = treasure.y;
           
-          // Simple collision detection
           if (
             subX < treasureX + 30 &&
             subX + subWidth > treasureX &&
@@ -262,20 +242,23 @@ const Game: React.FC = () => {
         })
       );
       
-      // Check hurdle collisions
-      hurdles.forEach(hurdle => {
+      for (const hurdle of hurdles) {
         const hurdleSize = hurdle.size;
         const hurdleX = hurdle.x;
         const hurdleY = hurdle.y;
-        const collisionSize = hurdle.type === 'rock' ? hurdleSize * 0.8 : hurdleSize * 0.5;
+        const collisionSize = hurdle.type === 'rock' ? hurdleSize * 0.7 : hurdleSize * 0.4;
         
-        // Simple collision detection
-        if (
-          subX < hurdleX + collisionSize &&
-          subX + subWidth > hurdleX &&
-          subY < hurdleY + collisionSize &&
-          subY + subHeight > hurdleY
-        ) {
+        const subCenterX = subX + subWidth / 2;
+        const subCenterY = subY + subHeight / 2;
+        const hurdleCenterX = hurdleX + hurdleSize / 2;
+        const hurdleCenterY = hurdleY + hurdleSize / 2;
+        
+        const dx = subCenterX - hurdleCenterX;
+        const dy = subCenterY - hurdleCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < (subWidth / 2 + collisionSize / 2)) {
+          console.log("Collision with hurdle detected!");
           setLives(prev => {
             if (prev <= 1) {
               setGameOver(true);
@@ -283,16 +266,6 @@ const Game: React.FC = () => {
             }
             return prev - 1;
           });
-          
-          // Reposition the submarine slightly away from the hurdle (bounce effect)
-          const centerX = submarinePosition.x + subWidth / 2;
-          const centerY = submarinePosition.y + subHeight / 2;
-          const hurdleCenterX = hurdleX + hurdleSize / 2;
-          const hurdleCenterY = hurdleY + hurdleSize / 2;
-          
-          const dx = centerX - hurdleCenterX;
-          const dy = centerY - hurdleCenterY;
-          const distance = Math.sqrt(dx * dx + dy * dy);
           
           if (distance > 0) {
             const bounceDistance = 50;
@@ -304,10 +277,11 @@ const Game: React.FC = () => {
               y: Math.max(0, Math.min(prev.y + normalizedDy, containerSize.height - 50))
             }));
           }
+          
+          break;
         }
-      });
+      }
       
-      // Check fish collisions
       fishes.forEach(fish => {
         const fishSize = fish.size;
         let fishX = 0;
@@ -320,7 +294,6 @@ const Game: React.FC = () => {
         
         const fishY = fish.y;
         
-        // Simple collision detection
         if (
           subX < fishX + fishSize &&
           subX + subWidth > fishX &&
@@ -335,7 +308,6 @@ const Game: React.FC = () => {
             return prev - 1;
           });
           
-          // Reset fishes on collision
           setFishes(generateFishes(6 + Math.floor(score / 50)));
         }
       });
@@ -343,9 +315,8 @@ const Game: React.FC = () => {
     
     const collisionInterval = setInterval(checkCollisions, 100);
     return () => clearInterval(collisionInterval);
-  }, [submarinePosition, treasures, fishes, hurdles, isPlaying, gameOver, score, time, containerSize]);
-  
-  // Generate random fishes
+  }, [submarinePosition, treasures, hurdles, fishes, isPlaying, gameOver, score, time, containerSize]);
+
   const generateFishes = (count: number): FishType[] => {
     const newFishes = [];
     for (let i = 0; i < count; i++) {
@@ -363,8 +334,7 @@ const Game: React.FC = () => {
     }
     return newFishes;
   };
-  
-  // Generate random treasures
+
   const generateTreasures = (count: number): TreasureType[] => {
     const newTreasures = [];
     for (let i = 0; i < count; i++) {
@@ -377,8 +347,7 @@ const Game: React.FC = () => {
     }
     return newTreasures;
   };
-  
-  // Generate random hurdles
+
   const generateHurdles = (count: number): HurdleType[] => {
     const newHurdles = [];
     for (let i = 0; i < count; i++) {
@@ -393,8 +362,7 @@ const Game: React.FC = () => {
     }
     return newHurdles;
   };
-  
-  // Start or restart game
+
   const startGame = () => {
     setIsPlaying(true);
     setScore(0);
@@ -406,8 +374,7 @@ const Game: React.FC = () => {
     setHurdles(generateHurdles(4));
     setPollutionItems(generatePollution(7));
   };
-  
-  // Handle treasure collection
+
   const handleTreasureCollect = (id: number) => {
     setTreasures(prev => 
       prev.map(t => 
@@ -416,8 +383,7 @@ const Game: React.FC = () => {
     );
     setScore(prev => prev + 10);
   };
-  
-  // Respawn treasures when all are collected
+
   useEffect(() => {
     if (!isPlaying || gameOver) return;
     
@@ -426,31 +392,25 @@ const Game: React.FC = () => {
       setTreasures(generateTreasures(5));
     }
   }, [treasures, isPlaying, gameOver]);
-  
-  // Add more fish as score increases
+
   useEffect(() => {
     if (!isPlaying || gameOver) return;
     
-    // Every 50 points, add more fish
     if (score > 0 && score % 50 === 0) {
       setFishes(generateFishes(6 + Math.floor(score / 50)));
     }
   }, [score, isPlaying, gameOver]);
-  
-  // Check if all pollution is cleaned
+
   useEffect(() => {
     if (!isPlaying || gameOver) return;
     
     const allCleaned = pollutionItems.length > 0 && pollutionItems.every(p => p.cleaned);
     if (allCleaned) {
-      // Add bonus score for cleaning all pollution
       setScore(prev => prev + 50);
-      // Generate new pollution items
       setPollutionItems(generatePollution(7));
     }
   }, [pollutionItems, isPlaying, gameOver]);
-  
-  // Start screen
+
   if (!isPlaying && !gameOver) {
     return (
       <div 
@@ -470,13 +430,12 @@ const Game: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
     <div 
       ref={gameContainerRef}
       className="game-container"
     >
-      {/* Background layers with parallax effect */}
       <div className="absolute inset-0 opacity-30">
         {Array.from({ length: 20 }).map((_, i) => (
           <div 
@@ -494,7 +453,6 @@ const Game: React.FC = () => {
         ))}
       </div>
       
-      {/* Game elements */}
       {hurdles.map(hurdle => (
         <Hurdle
           key={hurdle.id}
@@ -549,7 +507,6 @@ const Game: React.FC = () => {
         isCleaning={isCleaning}
       />
       
-      {/* UI Elements */}
       <GameUI
         score={score}
         lives={lives}
@@ -558,7 +515,6 @@ const Game: React.FC = () => {
         gameOver={gameOver}
       />
       
-      {/* Cleaning instructions */}
       <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-20 backdrop-blur px-4 py-2 rounded-full text-white text-sm">
         Press <span className="px-2 py-1 bg-white bg-opacity-20 rounded mx-1">SPACE</span> to clean pollution
       </div>
