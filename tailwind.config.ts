@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,27 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				ocean: {
+					light: '#E0F7FA',
+					DEFAULT: '#80DEEA',
+					deep: '#006064',
+					darkest: '#002B36'
+				},
+				submarine: {
+					DEFAULT: '#FFCA28',
+					dark: '#F57F17'
+				},
+				fish: {
+					red: '#EF5350',
+					blue: '#42A5F5',
+					green: '#66BB6A',
+					purple: '#AB47BC',
+					yellow: '#FFEE58'
+				},
+				treasure: {
+					gold: '#FFD700',
+					silver: '#C0C0C0'
 				}
 			},
 			borderRadius: {
@@ -84,11 +106,45 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'swim-left': {
+					'0%': { transform: 'translateX(100%)' },
+					'100%': { transform: 'translateX(-100%)' }
+				},
+				'swim-right': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(100%)' }
+				},
+				'bubble': {
+					'0%': { transform: 'translateY(0)', opacity: '0' },
+					'50%': { opacity: '1' },
+					'100%': { transform: 'translateY(-100px)', opacity: '0' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'pulse-light': {
+					'0%, 100%': { opacity: '0.6' },
+					'50%': { opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 3s ease-in-out infinite',
+				'swim-left': 'swim-left 15s linear infinite',
+				'swim-right': 'swim-right 20s linear infinite',
+				'bubble': 'bubble 3s ease-in-out infinite',
+				'fade-in': 'fade-in 0.5s ease-out',
+				'pulse-light': 'pulse-light 2s ease-in-out infinite'
+			},
+			backgroundImage: {
+				'ocean-gradient': 'linear-gradient(180deg, #E0F7FA 0%, #80DEEA 40%, #006064 80%, #002B36 100%)'
 			}
 		}
 	},

@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,44 @@
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Game-specific styles */
+@layer components {
+  .game-container {
+    @apply relative overflow-hidden w-full h-screen bg-ocean-gradient;
+  }
+  
+  .submarine {
+    @apply absolute transition-all duration-300 ease-out transform-gpu will-change-transform;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+
+  .bubble {
+    @apply absolute rounded-full bg-white bg-opacity-60;
+  }
+
+  .fish {
+    @apply absolute will-change-transform;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  }
+
+  .treasure {
+    @apply absolute animate-pulse-light;
+  }
+
+  .backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .game-ui {
+    @apply fixed top-5 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-6 z-50 px-6 py-3 rounded-full bg-white bg-opacity-20 backdrop-blur border border-white border-opacity-30;
+  }
+  
+  .game-over {
+    @apply fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-50 animate-fade-in;
   }
 }
