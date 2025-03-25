@@ -116,6 +116,10 @@
   .submarine.cleaning {
     filter: drop-shadow(0 0 15px rgba(100, 217, 255, 0.6));
   }
+  
+  .submarine.destroying {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
 
   .bubble {
     @apply absolute rounded-full bg-white bg-opacity-60;
@@ -125,6 +129,20 @@
     @apply absolute rounded-full bg-blue-300 bg-opacity-80;
     transition: transform 0.5s ease-out, opacity 0.5s ease-out;
     filter: drop-shadow(0 0 5px rgba(136, 221, 255, 0.7));
+  }
+  
+  .explosion-particle {
+    @apply absolute rounded-full;
+    box-shadow: 0 0 10px 2px rgba(255, 165, 0, 0.6);
+    transform-origin: center center;
+    z-index: 60;
+  }
+  
+  .smoke-particle {
+    @apply absolute rounded-full bg-gray-300 bg-opacity-40;
+    box-shadow: 0 0 8px rgba(200, 200, 200, 0.5);
+    animation: smoke 2s ease-out forwards;
+    z-index: 60;
   }
 
   .fish {
@@ -157,6 +175,23 @@
   
   .game-over {
     @apply fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-50 animate-fade-in;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(0) translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: rotate(2deg) translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: rotate(-2deg) translateX(5px); }
+  }
+  
+  @keyframes smoke {
+    0% { 
+      transform: scale(0.5) translateY(0); 
+      opacity: 0.7;
+    }
+    100% { 
+      transform: scale(2) translateY(-50px); 
+      opacity: 0;
+    }
   }
 
   @keyframes pulse-slow {

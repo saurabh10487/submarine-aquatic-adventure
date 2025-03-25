@@ -6,9 +6,16 @@ interface SubmarineProps {
   rotation: number;
   onPositionChange: (position: { x: number; y: number }) => void;
   isCleaning?: boolean;
+  isDestroying?: boolean;
 }
 
-const Submarine: React.FC<SubmarineProps> = ({ position, rotation, onPositionChange, isCleaning = false }) => {
+const Submarine: React.FC<SubmarineProps> = ({ 
+  position, 
+  rotation, 
+  onPositionChange, 
+  isCleaning = false,
+  isDestroying = false
+}) => {
   const submarineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,15 +89,99 @@ const Submarine: React.FC<SubmarineProps> = ({ position, rotation, onPositionCha
     }
   }, [isCleaning, position]);
 
+  // Create destruction effect when isDestroying is true
+  useEffect(() => {
+    if (isDestroying && submarineRef.current && submarineRef.current.parentElement) {
+      // Create explosion particles
+      const particleCount = 30;
+      const colors = ['#FFD700', '#FF6347', '#FF4500', '#FF8C00', '#FFA500'];
+      
+      for (let i = 0; i < particleCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 5;
+        const distance = Math.random() * 100 + 50;
+        const size = Math.random() * 12 + 5;
+        const duration = Math.random() * 1000 + 800;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        const particle = document.createElement('div');
+        particle.className = 'explosion-particle';
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.backgroundColor = color;
+        
+        // Starting position at submarine center
+        const centerX = position.x + 45;
+        const centerY = position.y + 25;
+        particle.style.left = `${centerX}px`;
+        particle.style.top = `${centerY}px`;
+        
+        if (submarineRef.current?.parentElement) {
+          submarineRef.current.parentElement.appendChild(particle);
+        }
+        
+        // Animate particle outward
+        setTimeout(() => {
+          if (particle.parentElement) {
+            particle.style.transition = `transform ${duration}ms ease-out, opacity ${duration}ms ease-out`;
+            particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0.5)`;
+            particle.style.opacity = '0';
+          }
+        }, 0);
+        
+        // Remove particle after animation
+        setTimeout(() => {
+          if (particle.parentElement) {
+            particle.parentElement.removeChild(particle);
+          }
+        }, duration);
+      }
+      
+      // Add smoke effect
+      for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+          if (submarineRef.current && submarineRef.current.parentElement) {
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke-particle';
+            
+            const smokeSizeBase = 30;
+            const smokeSize = smokeSizeBase + Math.random() * 20;
+            smoke.style.width = `${smokeSize}px`;
+            smoke.style.height = `${smokeSize}px`;
+            
+            const offsetX = (Math.random() - 0.5) * 40;
+            const offsetY = (Math.random() - 0.5) * 40;
+            
+            // Position around submarine
+            smoke.style.left = `${position.x + 45 + offsetX}px`;
+            smoke.style.top = `${position.y + 25 + offsetY}px`;
+            
+            if (submarineRef.current?.parentElement) {
+              submarineRef.current.parentElement.appendChild(smoke);
+            }
+            
+            // Remove smoke after animation
+            setTimeout(() => {
+              if (smoke.parentElement) {
+                smoke.parentElement.removeChild(smoke);
+              }
+            }, 2000);
+          }
+        }, i * 100);
+      }
+    }
+  }, [isDestroying, position]);
+
   return (
     <div 
       ref={submarineRef}
-      className={`submarine ${isCleaning ? 'cleaning' : ''}`}
+      className={`submarine ${isCleaning ? 'cleaning' : ''} ${isDestroying ? 'destroying' : ''}`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
         transform: `rotate(${rotation}deg)`,
         transition: 'transform 0.3s ease-out, left 0.3s ease-out, top 0.3s ease-out',
+        opacity: isDestroying ? '0.7' : '1',
       }}
     >
       <svg width="90" height="50" viewBox="0 0 90 50">

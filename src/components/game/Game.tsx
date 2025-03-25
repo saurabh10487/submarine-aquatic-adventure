@@ -55,6 +55,7 @@ const Game: React.FC = () => {
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [isDestroying, setIsDestroying] = useState(false);
   
   const fishColors = ['red', 'blue', 'green', 'purple', 'yellow'];
 
@@ -259,24 +260,32 @@ const Game: React.FC = () => {
         
         if (distance < (subWidth / 2 + collisionSize / 2)) {
           console.log("Collision with hurdle detected!");
-          setLives(prev => {
-            if (prev <= 1) {
-              setGameOver(true);
-              return 0;
-            }
-            return prev - 1;
-          });
           
-          if (distance > 0) {
-            const bounceDistance = 50;
-            const normalizedDx = (dx / distance) * bounceDistance;
-            const normalizedDy = (dy / distance) * bounceDistance;
+          setIsDestroying(true);
+          
+          const currentPosition = { ...submarinePosition };
+          
+          setTimeout(() => {
+            setIsDestroying(false);
+            setLives(prev => {
+              if (prev <= 1) {
+                setGameOver(true);
+                return 0;
+              }
+              return prev - 1;
+            });
             
-            setSubmarinePosition(prev => ({
-              x: Math.max(0, Math.min(prev.x + normalizedDx, containerSize.width - 90)),
-              y: Math.max(0, Math.min(prev.y + normalizedDy, containerSize.height - 50))
-            }));
-          }
+            if (distance > 0) {
+              const bounceDistance = 50;
+              const normalizedDx = (dx / distance) * bounceDistance;
+              const normalizedDy = (dy / distance) * bounceDistance;
+              
+              setSubmarinePosition(prev => ({
+                x: Math.max(0, Math.min(prev.x + normalizedDx, containerSize.width - 90)),
+                y: Math.max(0, Math.min(prev.y + normalizedDy, containerSize.height - 50))
+              }));
+            }
+          }, 1000);
           
           break;
         }
@@ -300,15 +309,20 @@ const Game: React.FC = () => {
           subY < fishY + (fishSize * 0.6) &&
           subY + subHeight > fishY
         ) {
-          setLives(prev => {
-            if (prev <= 1) {
-              setGameOver(true);
-              return 0;
-            }
-            return prev - 1;
-          });
+          setIsDestroying(true);
           
-          setFishes(generateFishes(6 + Math.floor(score / 50)));
+          setTimeout(() => {
+            setIsDestroying(false);
+            setLives(prev => {
+              if (prev <= 1) {
+                setGameOver(true);
+                return 0;
+              }
+              return prev - 1;
+            });
+            
+            setFishes(generateFishes(6 + Math.floor(score / 50)));
+          }, 1000);
         }
       });
     };
@@ -505,6 +519,7 @@ const Game: React.FC = () => {
         rotation={submarineRotation}
         onPositionChange={setSubmarinePosition}
         isCleaning={isCleaning}
+        isDestroying={isDestroying}
       />
       
       <GameUI
