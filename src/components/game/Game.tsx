@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Submarine from './Submarine';
 import Fish from './Fish';
 import Treasure from './Treasure';
+import Hurdle from './Hurdle';
 import GameUI from './GameUI';
 
 interface FishType {
@@ -22,6 +22,14 @@ interface TreasureType {
   collected: boolean;
 }
 
+interface HurdleType {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  type: 'rock' | 'seaweed';
+}
+
 const Game: React.FC = () => {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -29,6 +37,7 @@ const Game: React.FC = () => {
   const [submarineRotation, setSubmarineRotation] = useState(0);
   const [fishes, setFishes] = useState<FishType[]>([]);
   const [treasures, setTreasures] = useState<TreasureType[]>([]);
+  const [hurdles, setHurdles] = useState<HurdleType[]>([]);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [time, setTime] = useState(60); // 60 seconds game time
@@ -172,6 +181,51 @@ const Game: React.FC = () => {
         })
       );
       
+      // Check hurdle collisions
+      hurdles.forEach(hurdle => {
+        const hurdleSize = hurdle.size;
+        const hurdleX = hurdle.x;
+        const hurdleY = hurdle.y;
+        const collisionSize = hurdle.type === 'rock' ? hurdleSize * 0.8 : hurdleSize * 0.5;
+        
+        // Simple collision detection
+        if (
+          subX < hurdleX + collisionSize &&
+          subX + subWidth > hurdleX &&
+          subY < hurdleY + collisionSize &&
+          subY + subHeight > hurdleY
+        ) {
+          setLives(prev => {
+            if (prev <= 1) {
+              setGameOver(true);
+              return 0;
+            }
+            return prev - 1;
+          });
+          
+          // Reposition the submarine slightly away from the hurdle (bounce effect)
+          const centerX = submarinePosition.x + subWidth / 2;
+          const centerY = submarinePosition.y + subHeight / 2;
+          const hurdleCenterX = hurdleX + hurdleSize / 2;
+          const hurdleCenterY = hurdleY + hurdleSize / 2;
+          
+          const dx = centerX - hurdleCenterX;
+          const dy = centerY - hurdleCenterY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance > 0) {
+            const bounceDistance = 50;
+            const normalizedDx = (dx / distance) * bounceDistance;
+            const normalizedDy = (dy / distance) * bounceDistance;
+            
+            setSubmarinePosition(prev => ({
+              x: Math.max(0, Math.min(prev.x + normalizedDx, containerSize.width - 90)),
+              y: Math.max(0, Math.min(prev.y + normalizedDy, containerSize.height - 50))
+            }));
+          }
+        }
+      });
+      
       // Check fish collisions
       fishes.forEach(fish => {
         const fishSize = fish.size;
@@ -208,7 +262,7 @@ const Game: React.FC = () => {
     
     const collisionInterval = setInterval(checkCollisions, 100);
     return () => clearInterval(collisionInterval);
-  }, [submarinePosition, treasures, fishes, isPlaying, gameOver, score, time, containerSize]);
+  }, [submarinePosition, treasures, fishes, hurdles, isPlaying, gameOver, score, time, containerSize]);
   
   // Generate random fishes
   const generateFishes = (count: number): FishType[] => {
@@ -243,6 +297,22 @@ const Game: React.FC = () => {
     return newTreasures;
   };
   
+  // Generate random hurdles
+  const generateHurdles = (count: number): HurdleType[] => {
+    const newHurdles = [];
+    for (let i = 0; i < count; i++) {
+      const hurdleSize = Math.random() * 30 + 40;
+      newHurdles.push({
+        id: Date.now() + i,
+        x: Math.random() * (containerSize.width - hurdleSize),
+        y: Math.random() * (containerSize.height - hurdleSize),
+        size: hurdleSize,
+        type: Math.random() > 0.5 ? 'rock' : 'seaweed'
+      });
+    }
+    return newHurdles;
+  };
+  
   // Start or restart game
   const startGame = () => {
     setIsPlaying(true);
@@ -252,6 +322,7 @@ const Game: React.FC = () => {
     setGameOver(false);
     setFishes(generateFishes(6));
     setTreasures(generateTreasures(5));
+    setHurdles(generateHurdles(4));
   };
   
   // Handle treasure collection
@@ -293,7 +364,7 @@ const Game: React.FC = () => {
       >
         <div className="relative z-10 text-center bg-black bg-opacity-40 backdrop-blur p-10 rounded-lg">
           <h1 className="text-4xl font-light text-white mb-6">Submarine Adventure</h1>
-          <p className="text-lg text-white mb-8">Navigate through the ocean, collect treasure, and avoid the fish!</p>
+          <p className="text-lg text-white mb-8">Navigate through the ocean, collect treasure, and avoid the fish and hurdles!</p>
           <button 
             onClick={startGame}
             className="px-8 py-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 text-white text-lg transition-all duration-300"
@@ -329,6 +400,17 @@ const Game: React.FC = () => {
       </div>
       
       {/* Game elements */}
+      {hurdles.map(hurdle => (
+        <Hurdle
+          key={hurdle.id}
+          id={hurdle.id}
+          x={hurdle.x}
+          y={hurdle.y}
+          size={hurdle.size}
+          type={hurdle.type}
+        />
+      ))}
+      
       {treasures.map(treasure => (
         <Treasure
           key={treasure.id}
