@@ -113,8 +113,18 @@
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   }
 
+  .submarine.cleaning {
+    filter: drop-shadow(0 0 15px rgba(100, 217, 255, 0.6));
+  }
+
   .bubble {
     @apply absolute rounded-full bg-white bg-opacity-60;
+  }
+
+  .cleaning-bubble {
+    @apply absolute rounded-full bg-blue-300 bg-opacity-80;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    filter: drop-shadow(0 0 5px rgba(136, 221, 255, 0.7));
   }
 
   .fish {
@@ -131,6 +141,11 @@
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
   }
 
+  .pollution-item {
+    @apply absolute;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
   .backdrop-blur {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -142,5 +157,52 @@
   
   .game-over {
     @apply fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-50 animate-fade-in;
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s infinite ease-in-out;
+  }
+
+  .animate-pulse-light {
+    animation: pulse-slow 2s infinite ease-in-out;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px) rotate(2deg);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s infinite ease-in-out;
+  }
+
+  @keyframes bubble {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: translateY(-100px) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-bubble {
+    animation: bubble var(--duration, 4s) ease-out;
   }
 }

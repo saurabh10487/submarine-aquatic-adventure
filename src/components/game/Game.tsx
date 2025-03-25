@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Submarine from './Submarine';
 import Fish from './Fish';
 import Treasure from './Treasure';
 import Hurdle from './Hurdle';
 import GameUI from './GameUI';
+import PollutionItem from './PollutionItem';
 
 interface FishType {
   id: number;
@@ -30,6 +32,15 @@ interface HurdleType {
   type: 'rock' | 'seaweed';
 }
 
+interface PollutionType {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  type: 'plastic' | 'oil' | 'trash';
+  cleaned: boolean;
+}
+
 const Game: React.FC = () => {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -38,11 +49,13 @@ const Game: React.FC = () => {
   const [fishes, setFishes] = useState<FishType[]>([]);
   const [treasures, setTreasures] = useState<TreasureType[]>([]);
   const [hurdles, setHurdles] = useState<HurdleType[]>([]);
+  const [pollutionItems, setPollutionItems] = useState<PollutionType[]>([]);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [time, setTime] = useState(60); // 60 seconds game time
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isCleaning, setIsCleaning] = useState(false);
   
   // Colors for fish
   const fishColors = ['red', 'blue', 'green', 'purple', 'yellow'];
@@ -74,6 +87,24 @@ const Game: React.FC = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  // Generate random pollution items
+  const generatePollution = (count: number): PollutionType[] => {
+    const types: ('plastic' | 'oil' | 'trash')[] = ['plastic', 'oil', 'trash'];
+    const newPollution = [];
+    for (let i = 0; i < count; i++) {
+      const pollutionSize = Math.random() * 20 + 40;
+      newPollution.push({
+        id: Date.now() + i,
+        x: Math.random() * (containerSize.width - pollutionSize),
+        y: Math.random() * (containerSize.height - pollutionSize),
+        size: pollutionSize,
+        type: types[Math.floor(Math.random() * types.length)],
+        cleaned: false
+      });
+    }
+    return newPollution;
+  };
   
   // Game timer
   useEffect(() => {
@@ -140,14 +171,64 @@ const Game: React.FC = () => {
       }
     };
     
+    // Handle cleaning action with spacebar
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        setIsCleaning(true);
+        checkPollutionClean();
+        
+        // Stop cleaning after animation duration
+        setTimeout(() => {
+          setIsCleaning(false);
+        }, 500);
+      }
+    };
+    
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    document.addEventListener('keydown', handleKeyDown);
     
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [submarinePosition, isPlaying, gameOver, containerSize]);
+  }, [submarinePosition, isPlaying, gameOver, containerSize, isCleaning]);
+  
+  // Check if submarine can clean pollution
+  const checkPollutionClean = () => {
+    const subX = submarinePosition.x;
+    const subY = submarinePosition.y;
+    const subWidth = 90;
+    const subHeight = 50;
+    const cleaningRadius = 60; // Slightly bigger than submarine for better UX
+    
+    setPollutionItems(prev => 
+      prev.map(pollutionItem => {
+        if (pollutionItem.cleaned) return pollutionItem;
+        
+        const pollutionX = pollutionItem.x + pollutionItem.size / 2;
+        const pollutionY = pollutionItem.y + pollutionItem.size / 2;
+        const subCenterX = subX + subWidth / 2;
+        const subCenterY = subY + subHeight / 2;
+        
+        // Calculate distance between submarine center and pollution center
+        const dx = subCenterX - pollutionX;
+        const dy = subCenterY - pollutionY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // If submarine is in cleaning range of pollution
+        if (distance < cleaningRadius) {
+          // Add points based on pollution type
+          const pointValue = pollutionItem.type === 'oil' ? 15 : 10;
+          setScore(prev => prev + pointValue);
+          return { ...pollutionItem, cleaned: true };
+        }
+        
+        return pollutionItem;
+      })
+    );
+  };
   
   // Collision detection
   useEffect(() => {
@@ -323,6 +404,7 @@ const Game: React.FC = () => {
     setFishes(generateFishes(6));
     setTreasures(generateTreasures(5));
     setHurdles(generateHurdles(4));
+    setPollutionItems(generatePollution(7));
   };
   
   // Handle treasure collection
@@ -355,6 +437,19 @@ const Game: React.FC = () => {
     }
   }, [score, isPlaying, gameOver]);
   
+  // Check if all pollution is cleaned
+  useEffect(() => {
+    if (!isPlaying || gameOver) return;
+    
+    const allCleaned = pollutionItems.length > 0 && pollutionItems.every(p => p.cleaned);
+    if (allCleaned) {
+      // Add bonus score for cleaning all pollution
+      setScore(prev => prev + 50);
+      // Generate new pollution items
+      setPollutionItems(generatePollution(7));
+    }
+  }, [pollutionItems, isPlaying, gameOver]);
+  
   // Start screen
   if (!isPlaying && !gameOver) {
     return (
@@ -364,7 +459,7 @@ const Game: React.FC = () => {
       >
         <div className="relative z-10 text-center bg-black bg-opacity-40 backdrop-blur p-10 rounded-lg">
           <h1 className="text-4xl font-light text-white mb-6">Submarine Adventure</h1>
-          <p className="text-lg text-white mb-8">Navigate through the ocean, collect treasure, and avoid the fish and hurdles!</p>
+          <p className="text-lg text-white mb-8">Navigate through the ocean, collect treasure, avoid hazards, and clean up pollution!</p>
           <button 
             onClick={startGame}
             className="px-8 py-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 text-white text-lg transition-all duration-300"
@@ -411,6 +506,18 @@ const Game: React.FC = () => {
         />
       ))}
       
+      {pollutionItems.map(pollution => (
+        <PollutionItem
+          key={pollution.id}
+          id={pollution.id}
+          x={pollution.x}
+          y={pollution.y}
+          size={pollution.size}
+          type={pollution.type}
+          cleaned={pollution.cleaned}
+        />
+      ))}
+      
       {treasures.map(treasure => (
         <Treasure
           key={treasure.id}
@@ -439,6 +546,7 @@ const Game: React.FC = () => {
         position={submarinePosition}
         rotation={submarineRotation}
         onPositionChange={setSubmarinePosition}
+        isCleaning={isCleaning}
       />
       
       {/* UI Elements */}
@@ -449,6 +557,11 @@ const Game: React.FC = () => {
         onRestart={startGame}
         gameOver={gameOver}
       />
+      
+      {/* Cleaning instructions */}
+      <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-20 backdrop-blur px-4 py-2 rounded-full text-white text-sm">
+        Press <span className="px-2 py-1 bg-white bg-opacity-20 rounded mx-1">SPACE</span> to clean pollution
+      </div>
     </div>
   );
 };

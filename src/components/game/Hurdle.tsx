@@ -16,6 +16,7 @@ const Hurdle: React.FC<HurdleProps> = ({ id, x, y, size, type }) => {
       style={{ 
         left: `${x}px`,
         top: `${y}px`,
+        zIndex: type === 'rock' ? 5 : 3,
       }}
     >
       {type === 'rock' ? (
