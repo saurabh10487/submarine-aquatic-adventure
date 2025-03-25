@@ -14,7 +14,7 @@ const Treasure: React.FC<TreasureProps> = ({ id, x, y, collected, onCollect }) =
   
   return (
     <div 
-      className="treasure animate-float"
+      className="treasure animate-float absolute"
       style={{ 
         left: `${x}px`,
         top: `${y}px`,

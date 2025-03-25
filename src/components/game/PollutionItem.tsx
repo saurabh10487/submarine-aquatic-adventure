@@ -17,10 +17,12 @@ const PollutionItem: React.FC<PollutionItemProps> = ({ id, x, y, type, size, cle
     <div 
       className="pollution-item absolute"
       style={{ 
+        position: 'absolute',
         left: `${x}px`,
         top: `${y}px`,
         opacity: cleaned ? 0 : 1,
         transition: 'opacity 0.5s ease-out',
+        zIndex: 4
       }}
     >
       {type === 'plastic' && (

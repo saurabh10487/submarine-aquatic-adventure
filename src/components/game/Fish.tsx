@@ -26,6 +26,7 @@ const Fish: React.FC<FishProps> = ({ id, x, y, color, direction, size, speed }) 
     <div 
       className={`fish ${direction === 'left' ? 'animate-swim-left' : 'animate-swim-right'}`}
       style={{ 
+        position: 'absolute',
         top: `${y}px`,
         left: direction === 'left' ? `${x}px` : 'auto',
         right: direction === 'right' ? `${x}px` : 'auto',
