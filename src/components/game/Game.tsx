@@ -5,6 +5,7 @@ import Treasure from './Treasure';
 import Hurdle from './Hurdle';
 import GameUI from './GameUI';
 import PollutionItem from './PollutionItem';
+import Tutorial from './Tutorial';
 
 interface FishType {
   id: number;
@@ -56,7 +57,8 @@ const Game: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   const [isDestroying, setIsDestroying] = useState(false);
-  
+  const [showTutorial, setShowTutorial] = useState(true);
+
   const fishColors = ['red', 'blue', 'green', 'purple', 'yellow'];
 
   useEffect(() => {
@@ -440,11 +442,11 @@ const Game: React.FC = () => {
         className="game-container flex items-center justify-center"
       >
         <div className="relative z-10 text-center bg-black bg-opacity-40 backdrop-blur p-10 rounded-lg">
-          <h1 className="text-4xl font-light text-white mb-6">Submarine Adventure</h1>
-          <p className="text-lg text-white mb-8">Navigate through the ocean, collect treasure, avoid hazards, and clean up pollution!</p>
+          <h1 className="text-4xl font-pixel text-white mb-6">Submarine Adventure</h1>
+          <p className="text-lg text-white mb-8 font-pixel">Navigate through the ocean, collect treasure, avoid hazards, and clean up pollution!</p>
           <button 
             onClick={startGame}
-            className="px-8 py-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 text-white text-lg transition-all duration-300"
+            className="px-8 py-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 border border-white border-opacity-30 text-white text-lg font-pixel transition-all duration-300"
           >
             Start Game
           </button>
@@ -529,6 +531,10 @@ const Game: React.FC = () => {
         isCleaning={isCleaning}
         isDestroying={isDestroying}
       />
+      
+      {showTutorial && isPlaying && !gameOver && (
+        <Tutorial onClose={() => setShowTutorial(false)} />
+      )}
       
       <GameUI
         score={score}
