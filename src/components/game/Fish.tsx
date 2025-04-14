@@ -32,43 +32,25 @@ const Fish: React.FC<FishProps> = ({ id, x, y, color, direction, size, speed }) 
         right: direction === 'right' ? `${x}px` : 'auto',
         animationDuration: `${speed}s`,
         transform: direction === 'left' ? 'scaleX(1)' : 'scaleX(-1)',
+        imageRendering: 'pixelated'
       }}
     >
-      <svg width={size} height={size * 0.6} viewBox="0 0 100 60">
+      <svg width={size} height={size * 0.6} viewBox="0 0 8 6" shapeRendering="crispEdges">
         <g>
-          {/* Fish body */}
-          <path 
-            d="M20,30 Q40,10 70,30 Q40,50 20,30 Z" 
-            fill={fishColor} 
-            stroke={`${fishColor}88`}
-            strokeWidth="1"
-          />
+          {/* Fish body - pixel art style */}
+          <rect x="1" y="2" width="6" height="2" fill={fishColor} />
+          <rect x="2" y="1" width="4" height="4" fill={fishColor} />
           
           {/* Fish tail */}
-          <path 
-            d="M20,30 L5,15 L15,30 L5,45 Z" 
-            fill={fishColor} 
-            stroke={`${fishColor}88`}
-            strokeWidth="1"
-          />
+          <rect x="0" y="2" width="1" height="2" fill={fishColor} />
           
           {/* Fish eye */}
-          <circle cx="60" cy="25" r="4" fill="white" />
-          <circle cx="60" cy="25" r="2" fill="black" />
+          <rect x="6" y="2" width="1" height="1" fill="white" />
+          <rect x="6" y="2" width="1" height="1" fill="black" fillOpacity="0.5" />
           
           {/* Fish fin */}
-          <path 
-            d="M50,10 Q55,20 45,25" 
-            fill="none" 
-            stroke={`${fishColor}88`}
-            strokeWidth="2"
-          />
-          <path 
-            d="M50,50 Q55,40 45,35" 
-            fill="none" 
-            stroke={`${fishColor}88`}
-            strokeWidth="2"
-          />
+          <rect x="3" y="0" width="2" height="1" fill={fishColor} fillOpacity="0.8" />
+          <rect x="3" y="5" width="2" height="1" fill={fishColor} fillOpacity="0.8" />
         </g>
       </svg>
     </div>

@@ -18,29 +18,25 @@ const Treasure: React.FC<TreasureProps> = ({ id, x, y, collected, onCollect }) =
       style={{ 
         left: `${x}px`,
         top: `${y}px`,
+        imageRendering: 'pixelated'
       }}
     >
-      <svg width="30" height="30" viewBox="0 0 100 100">
+      <svg width="30" height="30" viewBox="0 0 8 8" shapeRendering="crispEdges">
         <g>
-          {/* Treasure chest */}
-          <rect x="20" y="40" width="60" height="40" rx="5" fill="#8D6E63" stroke="#5D4037" strokeWidth="2" />
-          <rect x="20" y="40" width="60" height="20" rx="5" fill="#A1887F" stroke="#5D4037" strokeWidth="2" />
+          {/* Treasure chest - pixel art style */}
+          <rect x="1" y="3" width="6" height="4" fill="#8D6E63" />
+          <rect x="1" y="3" width="6" height="2" fill="#A1887F" />
           
           {/* Chest lid */}
-          <path 
-            d="M20,40 Q50,20 80,40" 
-            fill="none" 
-            stroke="#5D4037" 
-            strokeWidth="2" 
-          />
+          <rect x="2" y="2" width="4" height="1" fill="#5D4037" />
           
           {/* Gold coins */}
-          <circle cx="35" cy="50" r="5" fill="#FFD700" stroke="#F57F17" strokeWidth="1" />
-          <circle cx="45" cy="48" r="5" fill="#FFD700" stroke="#F57F17" strokeWidth="1" />
-          <circle cx="55" cy="52" r="5" fill="#FFD700" stroke="#F57F17" strokeWidth="1" />
+          <rect x="2" y="4" width="1" height="1" fill="#FFD700" />
+          <rect x="4" y="4" width="1" height="1" fill="#FFD700" />
+          <rect x="3" y="5" width="1" height="1" fill="#FFD700" />
           
           {/* Chest lock */}
-          <rect x="45" y="35" width="10" height="10" rx="2" fill="#CFD8DC" stroke="#90A4AE" strokeWidth="1" />
+          <rect x="3" y="3" width="2" height="1" fill="#CFD8DC" />
         </g>
       </svg>
     </div>

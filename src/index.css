@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -105,7 +104,18 @@
 /* Game-specific styles */
 @layer components {
   .game-container {
-    @apply relative overflow-hidden w-full h-screen bg-ocean-gradient;
+    @apply relative overflow-hidden w-full h-screen;
+    background: #000022;
+    background-image: 
+      linear-gradient(
+        0deg,
+        #000033 0%,
+        #000044 25%,
+        #000066 50%,
+        #000088 75%,
+        #0000AA 100%
+      );
+    image-rendering: pixelated;
   }
   
   .submarine {

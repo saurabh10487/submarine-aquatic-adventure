@@ -180,36 +180,37 @@ const Submarine: React.FC<SubmarineProps> = ({
         left: `${position.x}px`,
         top: `${position.y}px`,
         transform: `rotate(${rotation}deg)`,
+        imageRendering: 'pixelated',
         transition: 'transform 0.3s ease-out, left 0.3s ease-out, top 0.3s ease-out',
         opacity: isDestroying ? '0.7' : '1',
       }}
     >
-      <svg width="90" height="50" viewBox="0 0 90 50">
+      <svg width="90" height="50" viewBox="0 0 16 9" shapeRendering="crispEdges">
         <g>
-          {/* Submarine body */}
-          <ellipse cx="45" cy="25" rx="40" ry="20" fill="#FFCA28" stroke="#F57F17" strokeWidth="2" />
+          {/* Submarine body - pixel art style */}
+          <rect x="2" y="3" width="12" height="5" fill="#FFCA28" />
+          <rect x="1" y="4" width="1" height="3" fill="#FFCA28" />
+          <rect x="14" y="4" width="1" height="3" fill="#FFCA28" />
           
           {/* Submarine viewport */}
-          <circle cx="65" cy="25" r="8" fill="#81D4FA" stroke="#0288D1" strokeWidth="1.5" />
-          <circle cx="65" cy="25" r="4" fill="#E1F5FE" fillOpacity="0.6" />
+          <rect x="11" y="4" width="2" height="2" fill="#81D4FA" />
+          <rect x="11" y="4" width="1" height="1" fill="#E1F5FE" fillOpacity="0.6" />
           
           {/* Submarine top */}
-          <rect x="30" y="5" width="20" height="8" rx="4" fill="#F57F17" />
+          <rect x="6" y="2" width="4" height="1" fill="#F57F17" />
           
           {/* Submarine periscope */}
-          <rect x="35" y="0" width="3" height="5" fill="#F57F17" />
-          <circle cx="36.5" cy="0" r="2" fill="#F57F17" />
+          <rect x="7" y="0" width="1" height="2" fill="#F57F17" />
           
           {/* Submarine propeller */}
-          <rect x="5" y="20" width="5" height="10" rx="2.5" fill="#F57F17" />
-          <ellipse cx="5" cy="25" rx="2" ry="8" fill="#FFB300" />
-
+          <rect x="0" y="4" width="1" height="3" fill="#FFB300" />
+          
           {/* Cleaning tool - only visible when cleaning */}
           {isCleaning && (
             <>
-              <rect x="15" y="40" width="25" height="3" rx="1.5" fill="#E0E0E0" />
-              <rect x="30" y="35" width="3" height="13" rx="1.5" fill="#E0E0E0" />
-              <circle cx="31.5" cy="35" r="5" fill="#81D4FA" fillOpacity="0.8" />
+              <rect x="3" y="8" width="5" height="1" fill="#E0E0E0" />
+              <rect x="6" y="7" width="1" height="2" fill="#E0E0E0" />
+              <rect x="5" y="6" width="2" height="2" fill="#81D4FA" fillOpacity="0.8" />
             </>
           )}
         </g>
