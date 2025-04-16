@@ -6,6 +6,8 @@ const Index = () => {
   return (
     <div className="h-screen w-screen overflow-hidden bg-gradient-to-b from-blue-400 to-blue-900">
       <Game />
+       <a href="https://www.instagram.com/mesaurabhsaxena/" target="_blank">Follow on Instagram</a> 
+          <a href="https://www.youtube.com/c/delhitechnologyclub" target="_blank">Follow on Youtube</a>
     </div>
   );
 };
